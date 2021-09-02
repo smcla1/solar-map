@@ -3,6 +3,12 @@ import * as React from "react";
 import { useRef, useState, useCallback } from "react";
 import styles from "./App.styl.js";
 import { withStyles } from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
+import Container from "@material-ui/core/Container";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
+import Card from "@material-ui/core/Card";
 import { Editor, DrawPolygonMode, EditingMode } from "react-map-gl-draw";
 
 import ControlPanel from "../../components/ControlPanel/ControlPanel";
@@ -12,7 +18,7 @@ import MapGL, {
   ScaleControl,
   GeolocateControl,
 } from "react-map-gl";
-import {getFeatureStyle, getEditHandleStyle} from './DrawTools.styl';
+import { getFeatureStyle, getEditHandleStyle } from "./DrawTools.styl";
 function App({ classes }) {
   const [viewport, setViewport] = useState({
     latitude: 40,
@@ -44,7 +50,7 @@ function App({ classes }) {
 
   // todo new buttons
   const drawTools = (
-    <div className="mapboxgl-ctrl-top-left">
+    <div className="mapboxgl-ctrl-top-right">
       <div className="mapboxgl-ctrl-group mapboxgl-ctrl">
         <button
           className="mapbox-gl-draw_ctrl-draw-btn mapbox-gl-draw_polygon"
@@ -107,19 +113,28 @@ function App({ classes }) {
         <ScaleControl style={scaleControlStyle} />
         <Editor
           ref={editorRef}
-          style={{width: '100%', height: '100%'}}
+          style={{ width: "100%", height: "100%" }}
           clickRadius={12}
           mode={mode}
           onSelect={onSelect}
           onUpdate={onUpdate}
-          editHandleShape={'circle'}
+          editHandleShape={"circle"}
           featureStyle={getFeatureStyle}
           editHandleStyle={getEditHandleStyle}
         />
         {drawTools}
       </MapGL>
-
-      <ControlPanel polygon={selectedFeature}/>
+      <Card className={classes.controls}>
+        <CardContent>
+          <Grid container xs={12} spacing={0} justifyContent="center">
+            <Grid item xs={6}>
+              <Typography variant="body2" color="textSecondary">
+                {"Nominal Power"}: <strong>4888</strong>
+              </Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
     </div>
   );
 }

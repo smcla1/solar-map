@@ -12,8 +12,9 @@ function ControlPanel({ classes, polygon }) {
   console.log(polygon);
   return (
     <div className={classes.root}>
-      <Grid container>
-        <Grid item xs={12}>
+
+      {/* <Grid container className={classes.container}>
+        <Grid item xs={12}> */}
           <Paper elevation={3}>
             {polygon && (
               <p>
@@ -30,8 +31,8 @@ function ControlPanel({ classes, polygon }) {
               </a>
             </div>
           </Paper>
-        </Grid>
-      </Grid>
+        {/* </Grid>
+      </Grid> */}
     </div>
   );
 }
