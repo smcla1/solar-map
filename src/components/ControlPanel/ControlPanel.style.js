@@ -13,6 +13,15 @@ const style = () => ({
   container: {
     height: '100%',
     width: '100%',
+  },
+  controls: {
+    opacity: "90%",
+    height: "15vh",
+    width: "50vw",
+    position: "absolute",
+    top: "85%",
+    left: "50%",
+    transform: "translate(-50%, -50%)"
   }
 });
 

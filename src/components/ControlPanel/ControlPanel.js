@@ -1,39 +1,56 @@
 import * as React from "react";
 import styles from "./ControlPanel.style";
 import { withStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
+import Card from "@material-ui/core/Card";
+import SolarUtils from "../../utils/SolarUtils";
 import area from "@turf/area";
 
 function ControlPanel({ classes, polygon }) {
-  // const polygon = props.polygon;
-  // todo move out
-  const polygonArea = polygon && area(polygon);
-  console.log(polygon);
+  const polygonArea = (polygon && area(polygon)) || 0;
   return (
-    <div className={classes.root}>
-
-      {/* <Grid container className={classes.container}>
-        <Grid item xs={12}> */}
-          <Paper elevation={3}>
-            {polygon && (
-              <p>
-                {polygonArea} <br />
-                square meters
-              </p>
-            )}
-            <div className="source-link">
-              <a
-                href="https://github.com/visgl/react-map-gl/tree/6.0-release/examples/draw-polygon"
-                target="_new"
-              >
-                View Code ↗
-              </a>
-            </div>
-          </Paper>
-        {/* </Grid>
-      </Grid> */}
-    </div>
+    <>
+      <Card className={classes.controls}>
+        <CardContent>
+          <Grid container spacing={0} justifyContent="center">
+            <Grid item xs={7}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography variant="body2" color="textSecondary">
+                    {"Area"}: <strong>{polygonArea}</strong>
+                    {"m"}
+                    <sup>2</sup>
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={5}>
+              <Grid container spacing={1} justifyContent="center">
+                <Grid item xs={12}>
+                  <Typography variant="h5" color="textSecondary">
+                    {"NOMINAL POWER"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={10}>
+                  <Typography variant="h2" color="primary">
+                    {SolarUtils.calculateNominalPowerByArea(
+                      polygonArea
+                    ).toFixed(3)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Typography color="textSecondary" variant="subtitle2">
+                    kW
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    </>
   );
 }
 

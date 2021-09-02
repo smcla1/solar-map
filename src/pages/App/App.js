@@ -3,10 +3,7 @@ import * as React from "react";
 import { useRef, useState, useCallback } from "react";
 import styles from "./App.styl.js";
 import { withStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
-import Card from "@material-ui/core/Card";
+
 import { Editor, DrawPolygonMode, EditingMode } from "react-map-gl-draw";
 
 import MapGL, {
@@ -16,6 +13,7 @@ import MapGL, {
   GeolocateControl,
 } from "react-map-gl";
 import { getFeatureStyle, getEditHandleStyle } from "./DrawTools.styl";
+import ControlPanel from "../../components/ControlPanel/ControlPanel.js";
 function App({ classes }) {
   const [viewport, setViewport] = useState({
     latitude: 40,
@@ -121,17 +119,7 @@ function App({ classes }) {
         />
         {drawTools}
       </MapGL>
-      <Card className={classes.controls}>
-        <CardContent>
-          <Grid container xs={12} spacing={0} justifyContent="center">
-            <Grid item xs={6}>
-              <Typography variant="body2" color="textSecondary">
-                {"Nominal Power"}: <strong>4888</strong>
-              </Typography>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+      <ControlPanel polygon={selectedFeature}></ControlPanel>
     </div>
   );
 }

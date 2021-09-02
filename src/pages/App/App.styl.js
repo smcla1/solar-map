@@ -14,15 +14,7 @@ const style = () => ({
     height: "100vh",
     
   },
-  controls: {
-    opacity: "90%",
-    height: "15vh",
-    width: "50vw",
-    position: "absolute",
-    top: "85%",
-    left: "50%",
-    transform: "translate(-50%, -50%)"
-  }
+
 });
 
 export default style;
