@@ -4,9 +4,24 @@ import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { withStyles } from "@material-ui/core/styles";
 import MapGL from "react-map-gl";
 import Geocoder from "react-map-gl-geocoder";
+import OverlayStyles from "./OverlayStyles";
 
-function Map({ classes, handleSelectedFeatureChange, children }) {
+import { Editor, DrawPolygonMode, EditingMode } from "react-map-gl-draw";
+import {
+  getFeatureStyle,
+  getEditHandleStyle,
+} from "../../components/Map/DrawTools.styl";
+import {
+  NavigationControl,
+  FullscreenControl,
+  ScaleControl,
+  GeolocateControl,
+} from "react-map-gl";
+
+function Map({ classes, onSelectedFeatureChange, polygon }) {
   const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+
+
   const [viewport, setViewport] = useState({
     latitude: 40,
     longitude: -100,
@@ -15,29 +30,74 @@ function Map({ classes, handleSelectedFeatureChange, children }) {
     pitch: 0,
   });
 
+  const [mode, setMode] = useState(null);
+  const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(null);
+  const editorRef = useRef(null);
+  const onSelect = useCallback((options) => {
+    console.log('ON SELECT', options.selectedFeatureIndex);
+    setSelectedFeatureIndex(options && options.selectedFeatureIndex);
+  }, []);
+
+  const onDelete = useCallback(() => {
+    if (selectedFeatureIndex !== null && selectedFeatureIndex >= 0) {
+      editorRef.current.deleteFeatures(selectedFeatureIndex);
+    }
+  }, [selectedFeatureIndex]);
+
+  const onUpdate = ({ editType }) => {
+    
+    if (editType === "addFeature") {
+      console.log('UPDATE', editType);
+      setMode(new EditingMode());
+      const selectedFeature =
+      features &&
+      (features[selectedFeatureIndex] || features[features.length - 1]);
+      onSelectedFeatureChange(selectedFeature);
+
+    }
+  };
+
+  // Ideally this would use consistent styling with the app.
+  const drawTools = (
+    <div className="mapboxgl-ctrl-top-left">
+      <div className="mapboxgl-ctrl-group mapboxgl-ctrl">
+        <button
+          className="mapbox-gl-draw_ctrl-draw-btn mapbox-gl-draw_polygon"
+          title="Polygon tool (p)"
+          onClick={() => setMode(new DrawPolygonMode())}
+        />
+        <button
+          className="mapbox-gl-draw_ctrl-draw-btn mapbox-gl-draw_trash"
+          title="Delete"
+          onClick={onDelete}
+        />
+      </div>
+    </div>
+  );
+
+  const features = editorRef.current && editorRef.current.getFeatures();
+  // const selectedFeature =
+  //   features &&
+  //   (features[selectedFeatureIndex] || features[features.length - 1]);
+  // console.log("*", selectedFeature);
+
   const mapRef = useRef();
   const handleViewportChange = useCallback(
     (newViewport) => setViewport(newViewport),
     []
   );
+
   const handleGeocoderViewportChange = useCallback(
     (newViewport) => {
       const geocoderDefaultOverrides = { transitionDuration: 1000 };
 
       return handleViewportChange({
         ...newViewport,
-        ...geocoderDefaultOverrides
+        ...geocoderDefaultOverrides,
       });
     },
     [handleViewportChange]
   );
-
-  const geocoderStyle = {
-    bottom: 50,
-    left: 50,
-    padding: "10px",
-  };
-  
 
   return (
     <div className={classes.root}>
@@ -55,9 +115,23 @@ function Map({ classes, handleSelectedFeatureChange, children }) {
           onViewportChange={handleGeocoderViewportChange}
           mapboxApiAccessToken={MAPBOX_TOKEN}
           position="top-right"
-          style={geocoderStyle}
         />
-        {children}
+        <GeolocateControl style={OverlayStyles.geolocateStyle} />
+        <FullscreenControl style={OverlayStyles.fullscreenControlStyle} />
+        <NavigationControl style={OverlayStyles.navStyle} />
+        <ScaleControl style={OverlayStyles.scaleControlStyle} />
+        <Editor
+          ref={editorRef}
+          style={{ width: "100%", height: "100%" }}
+          clickRadius={12}
+          mode={mode}
+          onSelect={onSelect}
+          onUpdate={onUpdate}
+          editHandleShape={"circle"}
+          featureStyle={getFeatureStyle}
+          editHandleStyle={getEditHandleStyle}
+        />
+        {drawTools}
       </MapGL>
     </div>
   );
