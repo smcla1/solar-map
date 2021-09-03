@@ -5,10 +5,17 @@ import Grid from "@material-ui/core/Grid";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
+import PowerDetail from "../PowerDetail/PowerDetail";
 import SolarUtils from "../../utils/SolarUtils";
 import area from "@turf/area";
 
-function PowerMeter({ classes, polygon }) {
+function PowerMeter({
+  classes,
+  polygon,
+  solarRadiation,
+  perfRatio,
+  efficiency,
+}) {
   const polygonArea = (polygon && area(polygon)) || 0;
   return (
     <>
@@ -17,32 +24,64 @@ function PowerMeter({ classes, polygon }) {
           <Grid container spacing={0} justifyContent="center">
             <Grid item xs={7}>
               <Grid container>
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="textSecondary">
-                    {"Area"}: <strong>{polygonArea}</strong>
-                    {"m"}
-                    <sup>2</sup>
-                  </Typography>
-                </Grid>
+                <PowerDetail
+                  measurement={"PV AREA"}
+                  value={
+                    polygonArea > 1000000
+                      ? polygonArea.toExponential(2)
+                      : polygonArea.toFixed(3)
+                  }
+                  units={
+                    <>
+                      {"m"}
+                      <sup>2</sup>
+                    </>
+                  }
+                />
+                <PowerDetail
+                  measurement={"YIELD"}
+                  value={efficiency}
+                  units={"%"}
+                />
+                <PowerDetail
+                  measurement={"AVG RADIATION"}
+                  value={solarRadiation}
+                  units={
+                    <>
+                      {"w/m"}
+                      <sup>2</sup>
+                    </>
+                  }
+                />
+                <PowerDetail
+                  measurement={"PERFORMANCE RATIO"}
+                  value={perfRatio}
+                  units={""}
+                />
               </Grid>
             </Grid>
             <Grid item xs={5}>
-              <Grid container spacing={1} justifyContent="center">
+              <Grid container spacing={1} justifyContent="flex-start">
                 <Grid item xs={12}>
-                  <Typography variant="h5" color="textSecondary">
+                  <Typography variant="h5" color="textPrimary">
                     {"NOMINAL POWER"}
                   </Typography>
                 </Grid>
                 <Grid item xs={10}>
-                  <Typography variant="h2" color="primary">
-                    {SolarUtils.calculateNominalPowerByArea(
-                      polygonArea
+                  <Typography display="inline" variant="h2" color="primary">
+                    {SolarUtils.calculateNominalPower(
+                      polygonArea,
+                      efficiency,
+                      solarRadiation,
+                      perfRatio
                     )}
                   </Typography>
-                </Grid>
-                <Grid item xs={2}>
-                  <Typography color="textSecondary" variant="subtitle2">
-                    kW
+                  <Typography
+                    display="inline"
+                    color="textSecondary"
+                    variant="subtitle2"
+                  >
+                    kWh
                   </Typography>
                 </Grid>
               </Grid>

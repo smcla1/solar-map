@@ -19,12 +19,17 @@ import {
 function App() {
   const [mode, setMode] = useState(null);
   const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(null);
+
+  // Variables for nominal power calculation.
+  const [efficiency, setEfficiency] = useState(17);
+  const [solarRadiation, setSolarRadiation] = useState(1000);
+  const [perfRatio, setPerfRatio] = useState(0.75);
+
   const editorRef = useRef(null);
 
   const onSelect = useCallback((options) => {
     setSelectedFeatureIndex(options && options.selectedFeatureIndex);
   }, []);
-
   const onDelete = useCallback(() => {
     if (selectedFeatureIndex !== null && selectedFeatureIndex >= 0) {
       editorRef.current.deleteFeatures(selectedFeatureIndex);
@@ -105,7 +110,12 @@ function App() {
         />
         {drawTools}
       </Map>
-      <PowerMeter polygon={selectedFeature} />
+      <PowerMeter
+        polygon={selectedFeature}
+        efficiency={efficiency}
+        perfRatio={perfRatio}
+        solarRadiation={solarRadiation}
+      />
     </>
   );
 }
