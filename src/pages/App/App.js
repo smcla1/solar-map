@@ -1,68 +1,122 @@
-import * as React from 'react';
-import {useState} from 'react';
+import * as React from "react";
+import { useRef, useState, useCallback } from "react";
+import Map from "../../components/Map/Map";
+import PowerMeter from "../../components/PowerMeter/PowerMeter";
+import { withStyles } from "@material-ui/core/styles";
 import styles from "./App.styl.js";
-import { withStyles } from '@material-ui/core/styles';
-import ControlPanel from '../../components/ControlPanel/ControlPanel';
-import MapGL, {
+import { Editor, DrawPolygonMode, EditingMode } from "react-map-gl-draw";
+import {
+  getFeatureStyle,
+  getEditHandleStyle,
+} from "../../components/Map/DrawTools.styl";
+import {
   NavigationControl,
   FullscreenControl,
   ScaleControl,
-  GeolocateControl
-} from 'react-map-gl';
+  GeolocateControl,
+} from "react-map-gl";
 
-const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+function App() {
+  const [mode, setMode] = useState(null);
+  const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(null);
 
-const geolocateStyle = {
-  top: 0,
-  left: 0,
-  padding: '10px'
-};
+  // Variables for nominal power calculation.
+  const [efficiency, setEfficiency] = useState(17);
+  const [solarRadiation, setSolarRadiation] = useState(1000);
+  const [perfRatio, setPerfRatio] = useState(0.75);
 
-const fullscreenControlStyle = {
-  top: 36,
-  left: 0,
-  padding: '10px'
-};
+  const editorRef = useRef(null);
 
-const navStyle = {
-  top: 72,
-  left: 0,
-  padding: '10px'
-};
+  const onSelect = useCallback((options) => {
+    setSelectedFeatureIndex(options && options.selectedFeatureIndex);
+  }, []);
+  const onDelete = useCallback(() => {
+    if (selectedFeatureIndex !== null && selectedFeatureIndex >= 0) {
+      editorRef.current.deleteFeatures(selectedFeatureIndex);
+    }
+  }, [selectedFeatureIndex]);
 
-const scaleControlStyle = {
-  bottom: 36,
-  left: 0,
-  padding: '10px'
-};
+  const onUpdate = useCallback(({ editType }) => {
+    console.log("onupdate");
+    if (editType === "addFeature") {
+      setMode(new EditingMode());
+    }
+  }, []);
 
-function App({ classes }) {
-  const [viewport, setViewport] = useState({
-    latitude: 40,
-    longitude: -100,
-    zoom: 3.5,
-    bearing: 0,
-    pitch: 0
-  });
+  // Ideally this would use consistent styling with the app.
+  const drawTools = (
+    <div className="mapboxgl-ctrl-top-right">
+      <div className="mapboxgl-ctrl-group mapboxgl-ctrl">
+        <button
+          className="mapbox-gl-draw_ctrl-draw-btn mapbox-gl-draw_polygon"
+          title="Polygon tool (p)"
+          onClick={() => setMode(new DrawPolygonMode())}
+        />
+        <button
+          className="mapbox-gl-draw_ctrl-draw-btn mapbox-gl-draw_trash"
+          title="Delete"
+          onClick={onDelete}
+        />
+      </div>
+    </div>
+  );
+
+  const features = editorRef.current && editorRef.current.getFeatures();
+  const selectedFeature =
+    features &&
+    (features[selectedFeatureIndex] || features[features.length - 1]);
+
+  const geolocateStyle = {
+    top: 0,
+    left: 0,
+    padding: "10px",
+  };
+
+  const fullscreenControlStyle = {
+    top: 36,
+    left: 0,
+    padding: "10px",
+  };
+
+  const navStyle = {
+    top: 72,
+    left: 0,
+    padding: "10px",
+  };
+
+  const scaleControlStyle = {
+    bottom: 36,
+    left: 0,
+    padding: "10px",
+  };
 
   return (
-    <div className={classes.root}>
-      <MapGL
-        {...viewport}
-        width="100%"
-        height="100%"
-        mapStyle="mapbox://styles/mapbox/dark-v9"
-        onViewportChange={setViewport}
-        mapboxApiAccessToken={TOKEN}
-      >
+    <>
+      <Map>
         <GeolocateControl style={geolocateStyle} />
         <FullscreenControl style={fullscreenControlStyle} />
         <NavigationControl style={navStyle} />
         <ScaleControl style={scaleControlStyle} />
-      </MapGL>
-
-      <ControlPanel />
-    </div>
+        <Editor
+          ref={editorRef}
+          style={{ width: "100%", height: "100%" }}
+          clickRadius={12}
+          mode={mode}
+          onSelect={onSelect}
+          onUpdate={onUpdate}
+          editHandleShape={"circle"}
+          featureStyle={getFeatureStyle}
+          editHandleStyle={getEditHandleStyle}
+        />
+        {drawTools}
+      </Map>
+      <PowerMeter
+        polygon={selectedFeature}
+        efficiency={efficiency}
+        perfRatio={perfRatio}
+        solarRadiation={solarRadiation}
+      />
+    </>
   );
 }
 
