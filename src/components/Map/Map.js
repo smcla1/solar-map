@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import styles from "./Map.styl.js";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { withStyles } from "@material-ui/core/styles";
@@ -18,9 +18,8 @@ import {
   GeolocateControl,
 } from "react-map-gl";
 
-function Map({ classes, onSelectedFeatureChange, polygon }) {
+function Map({ classes, onSelectedFeatureChange }) {
   const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-
 
   const [viewport, setViewport] = useState({
     latitude: 40,
@@ -33,27 +32,35 @@ function Map({ classes, onSelectedFeatureChange, polygon }) {
   const [mode, setMode] = useState(null);
   const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(null);
   const editorRef = useRef(null);
-  const onSelect = useCallback((options) => {
-    console.log('ON SELECT', options.selectedFeatureIndex);
-    setSelectedFeatureIndex(options && options.selectedFeatureIndex);
-  }, []);
+  const features = editorRef.current && editorRef.current.getFeatures();
+
+  const handleFeatureChange = useCallback(() => {
+    const selectedFeature =
+      features &&
+      (features[selectedFeatureIndex] || features[features.length - 1]);
+    console.log("handle sel feature change: ", selectedFeature);
+    onSelectedFeatureChange(selectedFeature);
+  }, [features, onSelectedFeatureChange, selectedFeatureIndex]);
+
+  const onSelect = useCallback(
+    (options) => {
+      setSelectedFeatureIndex(options && options.selectedFeatureIndex);
+      handleFeatureChange();
+    },
+    [handleFeatureChange]
+  );
 
   const onDelete = useCallback(() => {
     if (selectedFeatureIndex !== null && selectedFeatureIndex >= 0) {
       editorRef.current.deleteFeatures(selectedFeatureIndex);
+      handleFeatureChange();
     }
-  }, [selectedFeatureIndex]);
+  }, [selectedFeatureIndex, handleFeatureChange]);
 
   const onUpdate = ({ editType }) => {
-    
     if (editType === "addFeature") {
-      console.log('UPDATE', editType);
       setMode(new EditingMode());
-      const selectedFeature =
-      features &&
-      (features[selectedFeatureIndex] || features[features.length - 1]);
-      onSelectedFeatureChange(selectedFeature);
-
+      handleFeatureChange();
     }
   };
 
@@ -74,12 +81,6 @@ function Map({ classes, onSelectedFeatureChange, polygon }) {
       </div>
     </div>
   );
-
-  const features = editorRef.current && editorRef.current.getFeatures();
-  // const selectedFeature =
-  //   features &&
-  //   (features[selectedFeatureIndex] || features[features.length - 1]);
-  // console.log("*", selectedFeature);
 
   const mapRef = useRef();
   const handleViewportChange = useCallback(
