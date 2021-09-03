@@ -1,28 +1,22 @@
 import * as React from "react";
-// import {useState} from 'react';
 import { useRef, useState, useCallback } from "react";
-import styles from "./App.styl.js";
+import Map from "../../components/Map/Map";
+import PowerMeter from "../../components/PowerMeter/PowerMeter";
 import { withStyles } from "@material-ui/core/styles";
-
+import styles from "./App.styl.js";
 import { Editor, DrawPolygonMode, EditingMode } from "react-map-gl-draw";
-
-import MapGL, {
+import {
+  getFeatureStyle,
+  getEditHandleStyle,
+} from "../../components/Map/DrawTools.styl";
+import {
   NavigationControl,
   FullscreenControl,
   ScaleControl,
   GeolocateControl,
 } from "react-map-gl";
-import { getFeatureStyle, getEditHandleStyle } from "./DrawTools.styl";
-import ControlPanel from "../../components/ControlPanel/ControlPanel.js";
-function App({ classes }) {
-  const [viewport, setViewport] = useState({
-    latitude: 40,
-    longitude: -100,
-    zoom: 3.5,
-    bearing: 0,
-    pitch: 0,
-  });
 
+function App() {
   const [mode, setMode] = useState(null);
   const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(null);
   const editorRef = useRef(null);
@@ -38,12 +32,13 @@ function App({ classes }) {
   }, [selectedFeatureIndex]);
 
   const onUpdate = useCallback(({ editType }) => {
+    console.log("onupdate");
     if (editType === "addFeature") {
       setMode(new EditingMode());
     }
   }, []);
 
-  // todo new buttons
+  // Ideally this would use consistent styling with the app.
   const drawTools = (
     <div className="mapboxgl-ctrl-top-right">
       <div className="mapboxgl-ctrl-group mapboxgl-ctrl">
@@ -65,8 +60,6 @@ function App({ classes }) {
   const selectedFeature =
     features &&
     (features[selectedFeatureIndex] || features[features.length - 1]);
-
-  const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
   const geolocateStyle = {
     top: 0,
@@ -93,15 +86,8 @@ function App({ classes }) {
   };
 
   return (
-    <div className={classes.root}>
-      <MapGL
-        {...viewport}
-        width="100%"
-        height="100%"
-        mapStyle="mapbox://styles/mapbox/dark-v9"
-        onViewportChange={setViewport}
-        mapboxApiAccessToken={TOKEN}
-      >
+    <>
+      <Map>
         <GeolocateControl style={geolocateStyle} />
         <FullscreenControl style={fullscreenControlStyle} />
         <NavigationControl style={navStyle} />
@@ -118,9 +104,9 @@ function App({ classes }) {
           editHandleStyle={getEditHandleStyle}
         />
         {drawTools}
-      </MapGL>
-      <ControlPanel polygon={selectedFeature}></ControlPanel>
-    </div>
+      </Map>
+      <PowerMeter polygon={selectedFeature} />
+    </>
   );
 }
 

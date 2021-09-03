@@ -1,5 +1,5 @@
 import * as React from "react";
-import styles from "./ControlPanel.style";
+import styles from "./PowerMeter.style";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import CardContent from "@material-ui/core/CardContent";
@@ -8,7 +8,7 @@ import Card from "@material-ui/core/Card";
 import SolarUtils from "../../utils/SolarUtils";
 import area from "@turf/area";
 
-function ControlPanel({ classes, polygon }) {
+function PowerMeter({ classes, polygon }) {
   const polygonArea = (polygon && area(polygon)) || 0;
   return (
     <>
@@ -37,7 +37,7 @@ function ControlPanel({ classes, polygon }) {
                   <Typography variant="h2" color="primary">
                     {SolarUtils.calculateNominalPowerByArea(
                       polygonArea
-                    ).toFixed(3)}
+                    )}
                   </Typography>
                 </Grid>
                 <Grid item xs={2}>
@@ -54,4 +54,4 @@ function ControlPanel({ classes, polygon }) {
   );
 }
 
-export default withStyles(styles)(ControlPanel);
+export default withStyles(styles)(PowerMeter);
