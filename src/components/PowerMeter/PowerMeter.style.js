@@ -16,7 +16,7 @@ const style = () => ({
   },
   controls: {
     opacity: "90%",
-    height: "13vh",
+    height: "130px",
     width: "48vw",
     position: "absolute",
     top: "85%",

@@ -107,7 +107,8 @@ function Map({ classes, onSelectedFeatureChange }) {
         ref={mapRef}
         width="100%"
         height="100%"
-        mapStyle="mapbox://styles/mapbox/dark-v9"
+        // mapStyle="mapbox://styles/mapbox/dark-v9"
+        mapStyle="mapbox://styles/mapbox/satellite-v9"
         onViewportChange={setViewport}
         mapboxApiAccessToken={MAPBOX_TOKEN}
       >
