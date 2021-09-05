@@ -1,5 +1,6 @@
 import {RENDER_STATE} from 'react-map-gl-draw';
 
+// From react-map-gl-draw docs
 export function getEditHandleStyle({feature, state}) {
   switch (state) {
     case RENDER_STATE.SELECTED:
