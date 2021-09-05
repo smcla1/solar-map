@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 
+// A reusable component for displaying details/variables used in calculation.
 function PowerMeter({ measurement, value, units }) {
   return (
     <>
@@ -13,8 +14,10 @@ function PowerMeter({ measurement, value, units }) {
         </Typography>
         <Typography display="inline" color="secondary">
           <strong>{value}</strong>
-        </Typography >{" "}
-        <Typography display="inline" color="textSecondary">{units}</Typography>
+        </Typography>{" "}
+        <Typography display="inline" color="textSecondary">
+          {units}
+        </Typography>
       </Grid>
     </>
   );
