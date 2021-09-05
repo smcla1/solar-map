@@ -1,16 +1,13 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import styles from "./Map.styl.js";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { withStyles } from "@material-ui/core/styles";
 import MapGL from "react-map-gl";
+import DrawTools from "../DrawTools/DrawTools.js";
 import Geocoder from "react-map-gl-geocoder";
 import OverlayStyles from "./OverlayStyles";
-
 import { Editor, DrawPolygonMode, EditingMode } from "react-map-gl-draw";
-import {
-  getFeatureStyle,
-  getEditHandleStyle,
-} from "../../components/Map/DrawTools.styl";
+import { getFeatureStyle, getEditHandleStyle } from "./EditorStyles";
 import {
   NavigationControl,
   FullscreenControl,
@@ -29,19 +26,21 @@ function Map({ classes, onSelectedFeatureChange }) {
     pitch: 0,
   });
 
+  const mapRef = useRef();
   const [mode, setMode] = useState(null);
   const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(null);
   const editorRef = useRef(null);
   const features = editorRef.current && editorRef.current.getFeatures();
 
+  // Handle changes to features
   const handleFeatureChange = useCallback(() => {
     const selectedFeature =
       features &&
       (features[selectedFeatureIndex] || features[features.length - 1]);
-    console.log("handle sel feature change: ", selectedFeature);
     onSelectedFeatureChange(selectedFeature);
   }, [features, onSelectedFeatureChange, selectedFeatureIndex]);
 
+  // Handle selection of features
   const onSelect = useCallback(
     (options) => {
       setSelectedFeatureIndex(options && options.selectedFeatureIndex);
@@ -50,6 +49,7 @@ function Map({ classes, onSelectedFeatureChange }) {
     [handleFeatureChange]
   );
 
+  // Handle feature deletion
   const onDelete = useCallback(() => {
     if (selectedFeatureIndex !== null && selectedFeatureIndex >= 0) {
       editorRef.current.deleteFeatures(selectedFeatureIndex);
@@ -57,37 +57,22 @@ function Map({ classes, onSelectedFeatureChange }) {
     }
   }, [selectedFeatureIndex, handleFeatureChange]);
 
+  // Handle editor updates, only supports 'addFeature' for now.
   const onUpdate = ({ editType }) => {
     if (editType === "addFeature") {
       setMode(new EditingMode());
       handleFeatureChange();
     }
   };
-
-  // Ideally this would use consistent styling with the app.
-  const drawTools = (
-    <div className="mapboxgl-ctrl-top-left">
-      <div className="mapboxgl-ctrl-group mapboxgl-ctrl">
-        <button
-          className="mapbox-gl-draw_ctrl-draw-btn mapbox-gl-draw_polygon"
-          title="Polygon tool (p)"
-          onClick={() => setMode(new DrawPolygonMode())}
-        />
-        <button
-          className="mapbox-gl-draw_ctrl-draw-btn mapbox-gl-draw_trash"
-          title="Delete"
-          onClick={onDelete}
-        />
-      </div>
-    </div>
-  );
-
-  const mapRef = useRef();
+  
+  // Handle viewport changes
   const handleViewportChange = useCallback(
     (newViewport) => setViewport(newViewport),
-    []
+    [setViewport]
   );
 
+  // Handle geocoder viewport change, basically wrap 
+  // the main handler with a transition duration
   const handleGeocoderViewportChange = useCallback(
     (newViewport) => {
       const geocoderDefaultOverrides = { transitionDuration: 1000 };
@@ -107,7 +92,6 @@ function Map({ classes, onSelectedFeatureChange }) {
         ref={mapRef}
         width="100%"
         height="100%"
-        // mapStyle="mapbox://styles/mapbox/dark-v9"
         mapStyle="mapbox://styles/mapbox/satellite-v9"
         onViewportChange={setViewport}
         mapboxApiAccessToken={MAPBOX_TOKEN}
@@ -133,7 +117,10 @@ function Map({ classes, onSelectedFeatureChange }) {
           featureStyle={getFeatureStyle}
           editHandleStyle={getEditHandleStyle}
         />
-        {drawTools}
+        <DrawTools
+          onStartEditing={() => setMode(new DrawPolygonMode())}
+          onDelete={onDelete}
+        />
       </MapGL>
     </div>
   );

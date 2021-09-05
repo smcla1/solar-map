@@ -11,8 +11,8 @@ const style = () => ({
     lineHeight: 2,
   },
   container: {
-    height: '100%',
-    width: '100%',
+    height: "100%",
+    width: "100%",
   },
   controls: {
     opacity: "90%",
@@ -21,9 +21,8 @@ const style = () => ({
     position: "absolute",
     top: "85%",
     left: "50%",
-    transform: "translate(-50%, -50%)"
-  }
+    transform: "translate(-50%, -50%)",
+  },
 });
 
 export default style;
-

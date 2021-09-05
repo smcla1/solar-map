@@ -10,6 +10,7 @@ import PowerDetail from "../PowerDetail/PowerDetail";
 import SolarUtils from "../../utils/SolarUtils";
 import area from "@turf/area";
 
+// The map overlay for display of nominal power and details.
 function PowerMeter({
   classes,
   polygon,
@@ -23,7 +24,7 @@ function PowerMeter({
       <Card className={classes.controls}>
         <CardContent>
           <Grid container spacing={0} justifyContent="center">
-            <Grid item  md={7}>
+            <Grid item md={7}>
               <Box display={{ xs: "none", sm: "none", md: "block" }}>
                 <Grid container>
                   <PowerDetail
@@ -61,11 +62,9 @@ function PowerMeter({
                     units={""}
                   />
                 </Grid>
-                
               </Box>
-              
             </Grid>
-            
+
             <Grid item xs={12} md={5}>
               <Grid container spacing={1} justifyContent="flex-start">
                 <Grid item xs={12}>
