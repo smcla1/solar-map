@@ -1,5 +1,5 @@
 const SolarConstants = {
-  EFFICIENCY: 17,
+  EFFICIENCY: 0.17,
   SOLAR_RADIATION: 1000,
   PERFORMANCE_RATIO: 0.75,
 };
