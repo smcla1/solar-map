@@ -11,15 +11,15 @@ const SolarUtils = {
     const H = solarRadiation;
     const PR = perfRatio;
 
-    // Perform calculation
-    const nominalPower = Number.parseFloat(A * r * H * PR);
+    // Get nominal power in kWh
+    const nominalPowerKWH = Number.parseFloat(A * r * H * PR);
 
     // Format value and return
-    return nominalPower > 1000000
+    return nominalPowerKWH > 1000000
       ? // Use scientific notation
-        nominalPower.toExponential(2)
+      nominalPowerKWH.toExponential(2)
       : // Fix decimals to 3 places
-        nominalPower.toFixed(3);
+      nominalPowerKWH.toFixed(3);
   },
 };
 
